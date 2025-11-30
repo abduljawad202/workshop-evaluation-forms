@@ -1,11 +1,10 @@
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, responses, InsertResponse, managers, InsertManager } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
-// Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
@@ -89,4 +88,53 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+export async function createResponse(response: InsertResponse) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(responses).values(response);
+  return result;
+}
+
+export async function getAllResponses() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select().from(responses).orderBy(desc(responses.createdAt));
+}
+
+export async function getResponsesByLanguage(language: "ar" | "en" | "ml" | "ne") {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select().from(responses).where(eq(responses.language, language)).orderBy(desc(responses.createdAt));
+}
+
+export async function addManager(manager: InsertManager) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(managers).values(manager);
+  return result;
+}
+
+export async function getAllManagers() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select().from(managers).orderBy(desc(managers.createdAt));
+}
+
+export async function getActiveManagers() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select().from(managers).where(eq(managers.active, 1));
+}
+
+export async function deleteManager(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(managers).where(eq(managers.id, id));
+}
