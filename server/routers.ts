@@ -9,10 +9,10 @@ import fetch from 'node-fetch';
 
 const responseSchema = z.object({
   language: z.enum(["ar", "en", "ml", "ne"]),
-  name: z.string().min(1),
-  company: z.string().min(1),
-  phone: z.string().min(1),
-  email: z.string().email(),
+  name: z.string().optional(),
+  company: z.string().optional(),
+  phone: z.string().optional(),
+  email: z.string().email().optional(),
   rating1: z.number().min(1).max(5),
   rating2: z.number().min(1).max(5),
   rating3: z.number().min(1).max(5),
