@@ -5,6 +5,7 @@ import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { createResponse, getAllResponses, getResponsesByLanguage, addManager, getAllManagers, getActiveManagers, deleteManager } from "./db";
 import { notifyOwner } from "./_core/notification";
+import fetch from 'node-fetch';
 
 const responseSchema = z.object({
   language: z.enum(["ar", "en", "ml", "ne"]),
@@ -46,6 +47,30 @@ export const appRouter = router({
           ml: "മലയാളം",
           ne: "नेपाली"
         };
+        
+        // إرسال البيانات إلى Google Sheets
+        try {
+          const googleSheetUrl = 'https://script.google.com/macros/s/AKfycbwtff-gl9Z2nmyQKH9T28VKaNWxWd0CwAXC0WGRNQykvD3wRRJ8YCZzL0Xrquao0eef/usercontent';
+          await fetch(googleSheetUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              timestamp: new Date().toISOString(),
+              language: input.language,
+              participantName: input.name,
+              participantRole: input.company,
+              q1: input.rating1,
+              q2: input.rating2,
+              q3: input.rating3,
+              q4: input.rating4,
+              q5: input.rating5,
+              q6: input.rating6,
+              comments: input.suggestions
+            })
+          }).catch(err => console.log('Google Sheets sync error (non-blocking):', err));
+        } catch (error) {
+          console.log('Google Sheets sync error (non-blocking):', error);
+        }
         
         await notifyOwner({
           title: `New Workshop Evaluation - ${languageNames[input.language]}`,
