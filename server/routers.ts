@@ -5,6 +5,24 @@ import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { createResponse, getAllResponses, getResponsesByLanguage, addManager, getAllManagers, getActiveManagers, deleteManager } from "./db";
 import { notifyOwner } from "./_core/notification";
+import axios from "axios";
+
+// Google Apps Script Web App URL
+const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwtff-gl9Z2nmyQKH9T28VKaNWxWd0CwAXC0WGRNQykvD3wRRJ8YCZzL0Xrquao0eef/usercontent";
+
+// Function to send data to Google Sheets
+async function sendToGoogleSheet(data: any) {
+  try {
+    await axios.post(GOOGLE_SHEET_API_URL, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  } catch (error) {
+    console.warn("[Google Sheets] Failed to send data:", error);
+    // Don't throw error - continue even if Google Sheets fails
+  }
+}
 
 const responseSchema = z.object({
   language: z.enum(["ar", "en", "ml", "ne"]),
@@ -39,6 +57,19 @@ export const appRouter = router({
       .input(responseSchema)
       .mutation(async ({ input }) => {
         await createResponse(input);
+        
+        // Send data to Google Sheets
+        await sendToGoogleSheet({
+          language: input.language,
+          participantName: input.name,
+          participantRole: input.company,
+          q1: input.rating1,
+          q2: input.rating2,
+          q3: input.rating3,
+          q4: input.rating4,
+          q5: input.rating5,
+          comments: input.suggestions || ""
+        });
         
         const languageNames = {
           ar: "العربية",
