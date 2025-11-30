@@ -50,26 +50,35 @@ export const appRouter = router({
         
         // إرسال البيانات إلى Google Sheets
         try {
-          const googleSheetUrl = 'https://script.google.com/macros/s/AKfycbwtff-gl9Z2nmyQKH9T28VKaNWxWd0CwAXC0WGRNQykvD3wRRJ8YCZzL0Xrquao0eef/usercontent';
-          await fetch(googleSheetUrl, {
+          const SPREADSHEET_ID = '1anvRW0qEn2PUNn8S8Rv24uJw0t5aCKdCP56hK1nAjtI';
+          const SHEET_NAME = 'Sheet1';
+          const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwtff-gl9Z2nmyQKH9T28VKaNWxWd0CwAXC0WGRNQykvD3wRRJ8YCZzL0Xrquao0eef/usercontent';
+          
+          const dataToSend = {
+            timestamp: new Date().toISOString(),
+            language: input.language,
+            name: input.name,
+            company: input.company,
+            phone: input.phone,
+            email: input.email,
+            rating1: input.rating1,
+            rating2: input.rating2,
+            rating3: input.rating3,
+            rating4: input.rating4,
+            rating5: input.rating5,
+            rating6: input.rating6,
+            suggestions: input.suggestions || ''
+          };
+          
+          await fetch(GOOGLE_APPS_SCRIPT_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              timestamp: new Date().toISOString(),
-              language: input.language,
-              participantName: input.name,
-              participantRole: input.company,
-              q1: input.rating1,
-              q2: input.rating2,
-              q3: input.rating3,
-              q4: input.rating4,
-              q5: input.rating5,
-              q6: input.rating6,
-              comments: input.suggestions
-            })
-          }).catch(err => console.log('Google Sheets sync error (non-blocking):', err));
+            body: JSON.stringify(dataToSend),
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }).catch(err => console.log('Google Sheets sync (non-blocking):', err));
         } catch (error) {
-          console.log('Google Sheets sync error (non-blocking):', error);
+          console.log('Google Sheets sync (non-blocking):', error);
         }
         
         await notifyOwner({
