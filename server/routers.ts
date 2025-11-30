@@ -48,38 +48,7 @@ export const appRouter = router({
           ne: "नेपाली"
         };
         
-        // إرسال البيانات إلى Google Sheets
-        try {
-          const SPREADSHEET_ID = '1anvRW0qEn2PUNn8S8Rv24uJw0t5aCKdCP56hK1nAjtI';
-          const SHEET_NAME = 'Sheet1';
-          const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwtff-gl9Z2nmyQKH9T28VKaNWxWd0CwAXC0WGRNQykvD3wRRJ8YCZzL0Xrquao0eef/usercontent';
-          
-          const dataToSend = {
-            timestamp: new Date().toISOString(),
-            language: input.language,
-            name: input.name,
-            company: input.company,
-            phone: input.phone,
-            email: input.email,
-            rating1: input.rating1,
-            rating2: input.rating2,
-            rating3: input.rating3,
-            rating4: input.rating4,
-            rating5: input.rating5,
-            rating6: input.rating6,
-            suggestions: input.suggestions || ''
-          };
-          
-          await fetch(GOOGLE_APPS_SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify(dataToSend),
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          }).catch(err => console.log('Google Sheets sync (non-blocking):', err));
-        } catch (error) {
-          console.log('Google Sheets sync (non-blocking):', error);
-        }
+        // البيانات تم حفظها بنجاح في قاعدة البيانات
         
         await notifyOwner({
           title: `New Workshop Evaluation - ${languageNames[input.language]}`,
