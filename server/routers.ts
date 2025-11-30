@@ -8,7 +8,7 @@ import { notifyOwner } from "./_core/notification";
 import axios from "axios";
 
 // Google Apps Script Web App URL
-const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/1NP2CyUvv2DzirNka7m_8z2dKpJjpk9F7Y6dIOV4Yr3Otax2JpB_pek8J/usercontent";
+const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwtff-gl9Z2nmyQKH9T28VKaNWxWd0CwAXC0WGRNQykvD3wRRJ8YCZzL0Xrquao0eef/usercontent";
 
 // Function to send data to Google Sheets
 async function sendToGoogleSheet(data: any) {
